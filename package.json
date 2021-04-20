@@ -1,0 +1,27 @@
+{
+  "name": "rapid-project",
+  "version": "1.0.0",
+  "description": "Rapid backend web3 testing project",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/adminrapidinnovation/rapid-bnb-bridge-backend.git"
+  },
+  "author": "Vikas Nagar",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/adminrapidinnovation/rapid-bnb-bridge-backend/issues"
+  },
+  "homepage": "https://github.com/adminrapidinnovation/rapid-bnb-bridge-backend#readme",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "http": "0.0.1-security",
+    "mongoose": "^5.12.5",
+    "path": "^0.12.7",
+    "web3-eth": "^1.3.5"
+  }
+}
