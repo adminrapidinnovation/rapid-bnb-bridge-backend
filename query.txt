@@ -1,0 +1,24 @@
+//Ethereum messages logs
+CREATE TABLE `ethereumlog`.`ethereummessages` (
+  `id` INT NOT NULL AUTO_INCREMENT UNIQUE,
+  `messageId` INT NOT NULL,
+  `message` VARCHAR(100) NOT NULL,
+  `sent` TINYINT NOT NULL DEFAULT 0,
+  `response` VARCHAR(255) NOT NULL);
+
+//Binane messages logs
+CREATE TABLE `ethereumlog`.`binancemessages` (
+  `id` INT NOT NULL AUTO_INCREMENT UNIQUE,
+  `messageId` INT NOT NULL,
+  `message` VARCHAR(100) NOT NULL,
+  `sent` TINYINT NOT NULL DEFAULT 0,
+  `response` VARCHAR(255) NOT NULL);
+
+//Cron Logs table to maintain the Cron running Log
+CREATE TABLE `ethereumlog`.`cronlogs` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `cronName` VARCHAR(45) NOT NULL,
+  `cronMessage` VARCHAR(100) NOT NULL,
+  `cronRanAt` DATETIME NOT NULL DEFAULT Now(),
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `id_UNIQUE` (`id` ASC) VISIBLE);

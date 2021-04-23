@@ -3,12 +3,10 @@ const router = express.Router();
 
 const testController = require('../Controllers/test');
 
-// router.get("/",testController.controllerThing);
+router.get("/",testController.controllerThing);
 
-router.get("/contractBalance",testController.balanceOfContract);
+router.get("/checkForBinanceEntry", testController.checkForBinanceEntries);
 
-router.get("/approveContract",testController.approveContract);
-
-router.get("/approvedContracts",testController.checkApprovedContracts);
+router.get("/checkForEthereumEntry", testController.checkForEthereumEntries);
 
 module.exports = router;
