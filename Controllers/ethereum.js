@@ -83,14 +83,14 @@ Helper.checkEthereumEntry = async () =>{
     if(dbBinanceCount.length){
       binanceLocalId = dbBinanceCount[0].messageId;
     }
-
+    console.log("binanceLocalId",binanceLocalId);
     if((binanceOutgoingId == 0) || ((binanceOutgoingId != 1) && (binanceServerId == binanceLocalId))){
       // console.log("no changes are required");
       return("No changes required");
     }else{
       let count = 0, updateCount = 0, errCount = 0;
-      count = binanceOutgoingId - binanceLocalId;
-      // console.log(count);
+      count = binanceOutgoingId - (binanceLocalId ? binanceLocalId : dbBinanceCount.length);
+      console.log(count);
       if(binanceServerId == 0){
         binanceServerIds.push(binanceServerId);
       }else{
@@ -104,18 +104,20 @@ Helper.checkEthereumEntry = async () =>{
         }
       }
       
-      // console.log(binanceServerIds);
-      // console.log(binanceServerIds.length);
+      console.log(binanceServerIds);
+      console.log(binanceServerIds.length);
       for(let i=0; i<binanceServerIds.length; i++){
         let binanceMessage = await binCont.methods.getMessage(binanceServerIds[i]).call();
         // let binanceMessage = "Testing "+binanceServerIds[i];
         let updateEthereum = await ethCont.methods.pushInboundMessage(binanceServerIds[i], binanceMessage[0]).encodeABI();
         let receipt = await ethereumTransact(updateEthereum, 0);
         
+        let responseObj;
+
         if(receipt.success){
-          receipt = JSON.stringify(receipt.data);
+          responseObj = JSON.stringify(receipt.data);
         }else{
-          receipt = JSON.stringify(receipt.error);
+          responseObj = JSON.stringify(receipt.error);
         }
         // console.log("Receipt",receipt.slice(0,255));
         // let receipt = '{"success":"True"}';
@@ -123,7 +125,7 @@ Helper.checkEthereumEntry = async () =>{
         let obj = { 
           messageId : binanceServerIds[i], 
           message : binanceMessage[0], 
-          response : receipt.slice(0,255), 
+          response : responseObj, 
           sent : true 
         };
         

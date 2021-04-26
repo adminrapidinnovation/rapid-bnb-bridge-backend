@@ -30,20 +30,20 @@ Helper.controller = (req,res) => {
 
 const binanceTransact = async (data, value) => {
     try {
-      const count = await web3.eth.getTransactionCount(publicKey);
-      const gasPrice = await web3.eth.getGasPrice();
+      const count = await binWeb3.eth.getTransactionCount(publicKey);
+      const gasPrice = await binWeb3.eth.getGasPrice();
       // console.log(gasPrice,'gaasspr')
       const tx = {
         from: publicKey,
         to: binContractAddress,
-        gas: web3.utils.toHex(3000000),
+        gas: binWeb3.utils.toHex(3000000),
         gasPrice: Number(gasPrice),
         value: value,
         data: data ,
-        nonce: web3.utils.toHex(count),
+        nonce: binWeb3.utils.toHex(count),
       };
-      const signPromise = await web3.eth.accounts.signTransaction(tx,privateKey);
-      const sentTx = await web3.eth.sendSignedTransaction(signPromise.raw || signPromise.rawTransaction);  
+      const signPromise = await binWeb3.eth.accounts.signTransaction(tx,process.env.META_PRIVATE_KEY);
+      const sentTx = await binWeb3.eth.sendSignedTransaction(signPromise.raw || signPromise.rawTransaction);
       return({success : true,data : sentTx});
     } catch(e) {
       // console.log('in catch')
@@ -63,7 +63,7 @@ Helper.checkBinanceEntry = async () =>{
       const binCont = new binWeb3.eth.Contract(binContAbi, binContractAddress);
   
       let ethereumOutgoingId = await ethCont.methods.next_outgoing_message_id().call();
-      
+      console.log("ethereumOutgoingId", ethereumOutgoingId)
       let dbEthereumCount = await Eservice.ethereumLastMessage();
       // console.log(dbEthereumCount);
       let ethereumServerIds = [];
@@ -72,7 +72,7 @@ Helper.checkBinanceEntry = async () =>{
       if(dbEthereumCount.length){
         ethereumLocalId = dbEthereumCount[0].messageId;
       }
-  
+      console.log("ethereumLocalId",ethereumLocalId)
       // console.log("Ethereum Outgoing Call ->",ethereumOutgoingId,"Ehtereum Local Count",ethereumLocalId)
   
       if((ethereumOutgoingId == 0) || ((ethereumOutgoingId!= 1) && (ethereumServerId == ethereumLocalId))){
@@ -80,23 +80,23 @@ Helper.checkBinanceEntry = async () =>{
         return("No changes required");
       }else{
         let count = 0;
-        count = ethereumOutgoingId - ethereumLocalId;
-  
+        count = ethereumOutgoingId - (ethereumLocalId ? ethereumLocalId : dbEthereumCount.length);
+        console.log(count);
         if(ethereumServerId == 0){
           ethereumServerIds.push(ethereumServerId);
         }else{
           for(let i=0; i<count; i++){
             if(i==0 && dbEthereumCount.length == 0){
-              ethereumLocalId = 0;
+                ethereumLocalId = 0;
             }else{
-              ethereumLocalId = ethereumLocalId + 1;
+                ethereumLocalId = ethereumLocalId + 1;
             }
             ethereumServerIds.push(ethereumLocalId);
           }
         }
         
-        // console.log(ethereumServerIds);
-        // console.log(ethereumServerIds.length);
+        console.log(ethereumServerIds);
+        console.log(ethereumServerIds.length);
   
         let updateCount = 0, errCount = 0;
   
@@ -105,17 +105,19 @@ Helper.checkBinanceEntry = async () =>{
           let updateBinance = await binCont.methods.pushInboundMessage(ethereumServerIds[i], ethereumMessage[0]).encodeABI();
           let receipt = await binanceTransact(updateBinance, 0);
           
-          if(receipt.success){
-            receipt = JSON.stringify(receipt.data);
+          let responseObj;
+          
+          if(receipt.success){            
+            responseObj = JSON.stringify(receipt.data);
           }else{
-            receipt = JSON.stringify(receipt.error);
+            responseObj = JSON.stringify(receipt.error);            
           }
           
           // console.log("Receipt",receipt.slice(0,255));
           let insertObj = { 
               messageId : ethereumServerIds[i],
               message : ethereumMessage[0],
-              response : receipt.slice(0,255),
+              response : responseObj,
               sent : true
             };
 

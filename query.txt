@@ -4,7 +4,7 @@ CREATE TABLE `ethereumlog`.`ethereummessages` (
   `messageId` INT NOT NULL,
   `message` VARCHAR(100) NOT NULL,
   `sent` TINYINT NOT NULL DEFAULT 0,
-  `response` VARCHAR(255) NOT NULL);
+  `response` JSON NOT NULL);
 
 //Binane messages logs
 CREATE TABLE `ethereumlog`.`binancemessages` (
@@ -12,7 +12,7 @@ CREATE TABLE `ethereumlog`.`binancemessages` (
   `messageId` INT NOT NULL,
   `message` VARCHAR(100) NOT NULL,
   `sent` TINYINT NOT NULL DEFAULT 0,
-  `response` VARCHAR(255) NOT NULL);
+  `response` JSON NOT NULL);
 
 //Cron Logs table to maintain the Cron running Log
 CREATE TABLE `ethereumlog`.`cronlogs` (
