@@ -4,10 +4,11 @@ const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
 const path = require('path');
-const db = require('./custom_modules/mysql_connection/index');
-var testRouter = require('./Routes/test');
+const db = require('./CustomModules/connection');
+var ethereumRouter = require('./Routes/ethereum');
+var binanceRouter = require('./Routes/binance');
 var schedule = require('node-schedule');
-const testController = require('./Controllers/test');
+const ethereumController = require('./Controllers/ethereum');
 
 app.use(bodyParser.urlencoded({
     extended : true
@@ -23,24 +24,30 @@ app.listen(port,()=>{
     console.log("Server is up and running on "+port);
 });
 
-app.use("/test",testRouter);
+app.use("/ethereum",ethereumRouter);
+
+app.use("/binance",binanceRouter);
 
 schedule.scheduleJob('*/1 * * * *', async(req, res) => {
     if(process.env.APP_ENV != 'local'){
         console.log("Schedular Called");
-        let value = await testController.balanceOfContract();
+        let value = await ethereumController.balanceOfContract();
         console.log("Value in schedular",value);
     }
 })
 
 schedule.scheduleJob('*/5 * * * *', async(req, res) => {
-    console.log("binanceCron in Every 5 Minutes");
-    let binanceResponse = await testController.checkBinanceEntry();
-    await testController.updateCronLogs("binanceCron",binanceResponse);
+    if(process.env.APP_ENV != 'local'){
+        console.log("binanceCron in Every 5 Minutes");
+        let binanceResponse = await ethereumController.checkBinanceEntry();
+        await testController.updateCronLogs("binanceCron",binanceResponse);
+    }
 });
 
 schedule.scheduleJob('*/5 * * * *', async(req, res) => {
-    console.log("EthereumCron in Every 5 Minutes");
-    let ethereumResponse = await testController.checkEthereumEntry();
-    await testController.updateCronLogs("EthereumCron",ethereumResponse);
+    if(process.env.APP_ENV != 'local'){
+        console.log("EthereumCron in Every 5 Minutes");
+        let ethereumResponse = await ethereumController.checkEthereumEntry();
+        await testController.updateCronLogs("EthereumCron",ethereumResponse);
+    }
 });
